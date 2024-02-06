@@ -1,0 +1,334 @@
+/*
+* Dillon Jackson
+* dzjxb2
+* phases 3 schema
+* rdbms : mysql
+*
+* Constraint notes
+* 	Date format MMDDYYY
+*	Phone number format 10 digits
+*	what about the derived attribute?!?!?
+	
+*/
+/*create schema cemetery_db;*/
+use cemetery_db;
+create table Cemetery
+(
+	Cem_ID int not null,
+    Cem_Name VarChar(64),
+    Founding_Date int,
+    Number_Of_Burials int,
+    Primary key (Cem_ID)
+);
+
+
+
+create table Cemetery_Location
+(
+	Cem_ID int not null,
+    Cem_Address_Number int not null,
+    Cem_Street_Name VarChar(64) not null, 
+    Cem_City VarChar(64) not null,
+    Cem_State VarChar(64) not null,
+	Cem_Postal_Code VarChar(64) not null,
+    Primary key( Cem_ID, Cem_Address_Number, Cem_Street_Name, Cem_City, Cem_State, Cem_Postal_Code),
+    Foreign key( Cem_ID ) references Cemetery( Cem_ID )
+);
+    
+create table Plot
+(
+	Cem_ID int not null,
+    Plot_Number int not null,
+    Section int,
+    _Row int,
+    Spot int,
+    Primary key ( Cem_ID, Plot_Number),
+    Foreign key( Cem_ID) references Cemetery ( Cem_ID)
+);
+
+create table Plot_Owner
+(
+	Cem_ID int not null,
+    Plot_Number int not null,
+    Plot_Owner_Last_Name VarChar(64) not null,
+    Plot_Owner_First_Name VarChar(64),
+    Primary key( Cem_ID, Plot_Number, Plot_Owner_Last_Name ),
+    Foreign key(Cem_ID, Plot_Number ) references Plot (Cem_ID, Plot_Number )
+);
+
+create table Burial
+(
+	Cem_ID int not null,
+    Plot_Number int not null,
+    Bur_First_Name VarChar(64) not null,
+    Bur_Middle_Initial Char(1),
+    Bur_Last_Name VarChar(64) not null,
+    Birth_Date int,
+    Death_Date int,
+    Primary key( Cem_ID, Plot_Number, Bur_First_Name, Bur_Last_Name),
+    Foreign key(Cem_ID, Plot_Number ) references Plot (Cem_ID, Plot_Number )
+);
+
+create table Employee
+(
+	Emp_ID int not null,
+	Emp_First_Name VarChar(64) not null,
+    Emp_Last_Name VarChar(64) not null,
+    Primary key(Emp_ID, Emp_First_Name, Emp_Last_Name)
+);
+
+create table Is_Cemetery_Employee
+(
+	Cem_ID int not null,
+    Emp_ID int not null,
+    Primary key (Cem_ID, Emp_ID),
+    Foreign key(Cem_ID) references Cemetery(Cem_ID ),
+    Foreign key( Emp_ID ) references Employee( Emp_ID )
+);
+
+create table Employee_Address
+(
+	Emp_ID int not null,
+    Emp_Address_enum int not null,
+    Emp_Address_Number int not null,
+    Emp_Street_Name VarChar(64) not null, 
+    Emp_City VarChar(64) not null,
+    Emp_State VarChar(64) not null,
+	Emp_Postal_Code VarChar(64) not null,
+    Primary key(Emp_ID, Emp_Address_enum, Emp_Address_Number, Emp_Street_Name, Emp_City, Emp_State, Emp_Postal_Code),
+    Foreign key(Emp_ID) references Employee(Emp_ID)
+);
+
+create table Employee_Phone_Number
+(
+	Emp_ID int not null,
+    Emp_Phone_Number_Enum int not null,
+    Emp_Phone_Number char(10) not null,
+    Primary key(Emp_ID, Emp_Phone_Number_Enum, Emp_Phone_Number),
+    Foreign key(Emp_ID) references Employee(Emp_ID)
+);
+
+
+create table Employee_Email
+(
+	Emp_ID int not null,
+    Emp_Email_enum VarChar(64) not null,
+    Emp_Email VarChar(64) not null,
+    Primary key(Emp_ID, Emp_Email_enum, Emp_Email),
+    Foreign key(Emp_ID) references Employee(Emp_ID)
+);
+
+
+
+create table Business
+(
+	Bus_ID int not null,
+    Bus_Name VarChar(64) not null,
+    Bus_Service VarChar(64) not null,
+    Primary key(Bus_ID)
+);
+
+create table Is_Business_Employee
+(
+	Bus_ID int not null,
+    Emp_ID int not null,
+    Primary key(Bus_ID, Emp_ID),
+    Foreign key(Bus_ID) references Business(Bus_ID),
+    Foreign key(Emp_ID) references Employee(Emp_ID)
+);
+
+create table Business_Hours
+(
+	Bus_ID int not null,
+    Open_Hour int not null,
+    Close_Hour int not null,
+    Primary Key(Bus_ID, Open_Hour, Close_Hour),
+    Foreign key(Bus_ID) references Business(Bus_ID)
+);
+
+create table Business_Address
+(
+	Bus_ID int not null,
+    Bus_Address_enum int not null,
+    Bus_Address_Number int not null,
+    Bus_Street_Name VarChar(64) not null, 
+    Bus_City VarChar(64) not null,
+    Bus_state VarChar(64) not null,
+	Bus_Postal_Code VarChar(64) not null,
+    Primary key (Bus_ID, Bus_Address_enum, Bus_Address_Number, Bus_Street_Name, Bus_City, Bus_State, Bus_Postal_Code),
+    Foreign key (Bus_ID ) references Business(Bus_ID )
+);
+
+create table Business_Phone_Number
+(
+	Bus_ID int not null,
+    Bus_Phone_Number_Enum int not null,
+    Bus_Phone_Number char(10) not null,
+    Primary key (Bus_ID, Bus_Phone_Number_Enum, Bus_Phone_Number),
+    Foreign key( Bus_ID ) references Business( Bus_ID )
+);
+
+create table Business_Email
+(
+	Bus_ID int not null,
+    Bus_Email_enum VarChar(64) not null,
+    Bus_Email VarChar(64) not null,
+    Primary key (Bus_ID, Bus_email_enum, Bus_Email),
+    Foreign key(Bus_ID) references Business(Bus_ID)
+);
+
+create table Cemetery_Business_Association
+(
+	Bus_ID int not null,
+    Cem_ID int not null,
+    Primary key (Bus_ID, Cem_ID),
+    Foreign key( Bus_ID ) references Business( Bus_ID ) ,
+    Foreign key(Cem_ID) references Cemetery(Cem_ID) 
+);
+
+insert into cemetery values
+(1, "Cemetery 1", 01021903, 0),
+(2, "Cemetery 2", 02031804, 0),
+(3, "Cemetery 3", 01010001, 0);
+
+insert into cemetery_location values
+(1, 1111, "Hello street", "Columbia", "Missouri", 65202),
+(2, 2222, "Goodbye lane", "Columbia", "Missouri", 65202),
+(3, 3333, "Sunset highway", "Boonville", "Kansas", 33222);
+
+insert into plot values
+(1, 1, 1, 1, 1),
+(1, 2, 2, 2, 2),
+(2, 3, 3, 3, 3),
+(2, 4, 4, 4, 4),
+(3, 5, 5, 5, 5),
+(3, 6, 6, 6, 6),
+(3, 7, 7,7 , 7);
+
+insert into plot_owner values
+(1, 1, "Jackson", "Dillon"),
+(3, 5, "Jackson", "Madison"),
+(2, 3, "Jackson", "Robert");
+
+insert into burial values
+(1, 2, "Bernard", null, "Leo", 07021994, 08021998),
+(3,5,"Jackson", "Z", "Madison", 01202000, 01202020),
+(1,2,"Jackson","Z","Dillon", 07021994,12092022);
+
+insert into Employee values
+(1, "Ray", "Tols"),
+(2,"Ben","Tols"),
+(3,"Jason", "Benjamin"),
+(4,"Jason", "Mason"),
+(5,"Robert","Jackson");
+
+insert into Is_Cemetery_Employee values
+(1,1),
+(2,2);
+
+insert into Employee_Address values
+(1,1,6233,"Low road", "Columbia","Missouri","65202"),
+(2,1,5444,"high road", "Macson","Missouri",62622),
+(3,1,7965,"Town road", "Boonville", "Missouri",65233),
+(4,1,7211,"Lakewood drive","Chicago","Illinois",52321);
+
+insert into Employee_Phone_Number values
+(1,1,"5734624444"),
+(1,2,"5732479999"),
+(3, 1, "6653241111"),
+(4,1,"6732452222");
+
+insert into Employee_Email values
+(4,1,"mrcemetery@aol.com");
+
+insert into Business values
+(1, "Big headstones", "headstone sales"),
+(2, "Smalltown funeral services", "funeral services"),
+(3, "Cheap discount headstones", "headstone sales");
+
+insert into Is_Business_Employee values
+(1,1),
+(1,4),
+(2,4),
+(3,5);
+
+insert into Business_Hours values
+(1, 5,5),
+(2,12,3);
+
+insert into Business_Address values
+(1, 1, 6644, "high road", "Columbia", "Missouri", 65202),
+(2,1,4466, "low road", "Columbia", "Missouri", 65202),
+(2,2,5544, "Cemetery lane", "Boonville", "Missouri", 65233);
+
+insert into Business_Phone_Number values
+(1,1,"8889995555"),
+(1,2,"7774445555"),
+(2,1,"9992223333");
+
+insert into Business_Email values
+(3,1,"Contacthere@gmail.com");
+
+insert into Cemetery_Business_Association values
+(1,1),
+(1,2),
+(1,3),
+(2,1),
+(3,2);
+
+/* Function 1 sql statements, how to do multiple multi valued attributes */
+select c.Cem_Name, e.Emp_First_Name, e.Emp_Last_Name, epn.Emp_Phone_Number, em.Emp_Email
+from cemetery as c left join is_cemetery_employee as ice on c.Cem_ID = ice.Cem_ID
+left join employee as e on ice.Emp_ID = e.Emp_ID
+left join employee_phone_number as epn on epn.emp_id = e.Emp_ID 
+left join employee_email as em on em.Emp_ID = e.Emp_ID
+where c.Cem_ID = 2;
+
+select c.Cem_Name, b.Bus_Name, b.Bus_Service, ba.Bus_Address_Number, ba.Bus_Street_Name, ba.Bus_City, ba.Bus_state, ba.Bus_Postal_Code, bpn.Bus_Phone_Number, be.Bus_Email, bh.Open_Hour, bh.Close_Hour
+from cemetery as c
+left join cemetery_business_association as cba on c.Cem_ID = cba.Cem_ID
+left join business as b on cba.Bus_ID = b.Bus_ID
+left join business_address as ba on b.Bus_ID = ba.Bus_ID
+left join business_phone_number as bpn on b.Bus_ID = bpn.Bus_ID
+left join business_email as be on b.Bus_ID = be.Bus_ID
+left join business_hours as bh on b.Bus_ID = bh.Bus_ID
+where c.Cem_ID = 1;
+
+/* Function 2 sql statement */
+
+select c.Cem_Name, p.Section, p._row, p.Spot, b.Bur_First_Name, b.Bur_Last_Name, b.Birth_Date, b.Death_Date
+from cemetery as c
+inner join plot as p on c.Cem_ID = p.Cem_ID
+inner join burial as b on p.Plot_Number = b.Plot_Number
+where b.Bur_First_Name = 'Bernard' and b.Bur_Last_Name = 'leo';
+
+
+/* Funtion 3 sql statement */
+
+select c.Cem_Name, p.Section, p._row, p.Spot, po.Plot_Owner_First_Name, po.Plot_Owner_Last_Name
+from cemetery as c
+left join plot as p on c.Cem_ID = p.Cem_ID
+left join plot_owner as po on p.Plot_Number = po.Plot_Number
+left join burial as b on p.Plot_Number = b.Plot_Number
+where b.Bur_Last_Name is null and po.Plot_Owner_Last_Name is not null and c.Cem_ID = '1';
+
+
+
+/* function 4 */
+
+select *
+from plot as p
+left join plot_owner as po on p.plot_number = po.Plot_Number
+where p.Section = 2 and p._Row = 2 and p.spot = 2 and p.Cem_ID = 1 ;
+
+select max(p.Plot_Number)
+from plot as p
+where p.cem_id = 1;
+
+select *
+from plot
+where plot.Cem_ID = 1;
+
+
+
+/* END */
